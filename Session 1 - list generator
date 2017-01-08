@@ -1,0 +1,31 @@
+
+# During class we will be writing Python functions to generate lists of a user-specified length *m *with certain
+ # characteristics, such as a list of *m *integers randomly sampled from a distribution. Your task before class 
+ # is to write a function that will call any function generated in class *n *times, each time with a different 
+ # specified value of m, to generate a list of the *n *outputs. The entries of this list will themselves be lists. 
+ # More specifically:
+# Inputs: a function *f *that produces as output a list of length m, m itself, and a number n of lists you want to generate. Thus the function would be of the form g(f, m, n).
+# Outputs: a list of *n *lists the lengths of which are increasing multiples of 2 of m.
+# \
+# Example: Suppose f(m) returns a list containing m zeros and g is the function you write for the pre-class work. Then g(f, 2, 3) returns [[0, 0], [0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]].
+
+from random import randint
+
+def in_class_func (m): #m = num of integers from dist.
+	#this function returns a list
+	lis=[]
+	for _ in xrange(m):
+		lis.append(randint(-1000,1000))
+		return lis
+
+def list_generator(function,m,n): 
+	#n = num of iterations (number of lists in big list) 
+	#m=num of integers from dist. in initial list
+	the_list=[]
+	new_list=[]
+	for i in xrange(n):
+		new_list.append([in_class_func(m)]*2)
+		the_list.append(new_list)
+	return the_list
+
+print list_generator(in_class_func,2,3)
