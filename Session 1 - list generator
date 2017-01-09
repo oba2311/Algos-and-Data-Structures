@@ -10,22 +10,22 @@
 # Example: Suppose f(m) returns a list containing m zeros and g is the function you write for the pre-class work. Then g(f, 2, 3) returns [[0, 0], [0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]].
 
 from random import randint
+import random
+
 
 def in_class_func (m): #m = num of integers from dist.
 	#this function returns a list
 	lis=[]
 	for _ in xrange(m):
 		lis.append(randint(-1000,1000))
-		return lis
+	return lis
 
 def list_generator(function,m,n): 
 	#n = num of iterations (number of lists in big list) 
 	#m=num of integers from dist. in initial list
-	the_list=[]
 	new_list=[]
 	for i in xrange(n):
-		new_list.append([in_class_func(m)]*2)
-		the_list.append(new_list)
-	return the_list
+		new_list.append(function(randint(1,10)))
+	return new_list
 
-print list_generator(in_class_func,2,3)
+print list_generator(in_class_func, 2 ,3)
