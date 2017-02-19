@@ -1,0 +1,70 @@
+#Assinment2.py
+import numpy as np
+import random
+import math
+from matplotlib import pyplot as plt
+
+
+def estimatePi(r,w,h,N):
+    center = (w/2.0,h/2.0)
+    in_circle = 0
+    for _ in xrange(N):
+        x = random.uniform(0.0,w)
+        y = random.uniform(0.0,h)
+        distance = math.sqrt((x-center[0])**2+(y-center[1])**2)
+        if distance <= r:
+            in_circle += 1
+    ratio = float(in_circle)/N
+    pi = np.array([ratio*(w*h)/(r**2)])
+    return pi, ratio 
+
+#run, aggregate results:
+PiEstimation=[]
+num_darts=[]
+loopcount = 10001
+i=100
+# errorPos=[]
+TotalError=[]
+j=0
+while i <loopcount:
+    result=estimatePi(3,10,10,i)[0]
+    num_darts.append(i)
+    PiEstimation.append(result)
+    errorPos=(1.96*((estimatePi(3,10,10,i)[1])*(1- (estimatePi(3,10,10,i)[1]))/np.sqrt(i)))  #i/20 could beused.
+    # Minus=-errorPos[j]
+    # errorNeg.append(Minus)
+    # combinedError=errorPos[j]+errorNeg[j]
+    # print combinedError
+    TotalError.append(2*errorPos)
+    # j+=1
+    # print TotalError
+    i += 100
+
+
+
+#We now estimate Pi with Taylor series as well, and plot it as a reference:
+Pi2=[]
+Xaxis=[i for i in xrange(loopcount)]
+def SecondEstimationforErrorBars(iterations):
+    i=100
+    for i in xrange(iterations):
+        Pi2.append([(4 * sum(-float(k%4 - 2) / k for k in xrange(1, i+1, 2)))])
+        i+=100
+    return Pi2
+
+SecondEstimationforErrorBars(loopcount)
+
+# plot:
+ax = plt.gca()
+ax.relim()
+ax.autoscale_view()
+
+plt.title('Estimating the Value of Pi - Dartboard Simulation')
+plt.axhline(y=math.pi, color="green",linewidth=1.5)
+plt.ylabel('Pi Estimation')
+plt.xlabel('Number of Darts')
+plt.errorbar(num_darts,PiEstimation, yerr=TotalError,ecolor='magenta')
+plt.plot(Xaxis,Pi2,color="orange")
+plt.show("hold")
+
+print "finished"
