@@ -1,5 +1,69 @@
 #FuzzyMain.py
 
+import csv
+from fuzzywuzzy import fuzz
+import sys
+import subprocess
+import pandas as pd
+
+def scrap():
+	#run the script called "Scraping Payscale", to obtain expected earnings after graduation:
+	PayScaleEarnings = subprocess.check_output([sys.executable, "scrape payscale.py"])
+	df = pd.read_csv("PayScaleEarnings.csv")
+	#create lists of the names and payment:
+	Payscalelist=[]
+	for index, row in df.iterrows():
+	    Payscalelist.append(row['School Name'])
+
+	EarningsList=[]
+	for index, row in df.iterrows():
+	    EarningsList.append(row['Early Career Median Pay'])
+	return Payscalelist, EarningsList
+
+def dataPrep():
+	#Use the provided dataset from USNews to obtain acceptance rates per college:
+	USNewsNames=[]
+	USNewsAcceptance=[]
+	df1 = pd.read_csv('110.Final.csv')
+	for index, row in df1.iterrows():
+	    USNewsNames.append(row['name'])
+	for index, row in df1.iterrows():
+	    USNewsAcceptance.append(row['Fall 2015 acceptance rate'])
+	return USNewsNames, USNewsAcceptance
+
+#########################
+#Fuzzy:
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
+def fuzz(driver):
+    myDB["Fuzzmatched"]=myDB.apply(lambda row: fuzz.token_sort_ratio(row[myDB.columns[0]], s[myDB.columns[2]]), axis=1)
+    print(driver)
+    return(driver)
+
+#Token set ratio - the token set ration orders the words in the same order before checking.
+
+#Generate a CSV file that will be our output:
+def createDB(list1,list2,list3,list4):
+	rows = zip(list1,list2,list3,list4)
+	with open('CollegeAcceptanceVSIncome.csv', 'wb') as myfile:
+		w = csv.writer(myfile)
+		w.writerow(['Payscale college','Earnings','USNews college','Acceptance Rate'])
+		for row in rows:
+			w.writerow(row)
+
+	#Turn in into a df:
+	pd.dataframe=myfile
+	myDB = pd.read_csv("CollegeAcceptanceVSIncome.csv")
+	return myDB
+
+scrap()
+dataPrep()
+createDB(Payscalelist,EarningsList,USNewsNames,USNewsAcceptance)
+fuzz("CollegeAcceptanceVSIncome.csv")
+
+#take time time.timeit  and print.
+
 #Requirements:
 # fuzzywuzzy form: https://pypi.python.org/pypi/fuzzywuzzy#downloads
 # BeautifulSoup from: https://www.crummy.com/software/BeautifulSoup/bs4/doc/
@@ -7,59 +71,3 @@
 # Python-Levenstein from: 
 
 #USnews DataSet from: https://github.com/Shengjiezh/Scraping-USNews-College-Ranking/blob/master/ranking_university_USnews.csv
-
-
-import csv
-from fuzzywuzzy import fuzz
-import sys
-import subprocess
-import pandas as pd
-
-
-#run the script called "Scraping Payscale", to obtain expected earnings after graduation:
-PayScaleEarnings = subprocess.check_output([sys.executable, "scrape payscale.py"])
-df = pd.read_csv("PayScaleEarnings.csv")
-SchoolName = df["School Name"]
-df.set_index('School Name').to_dict()  #Convert to a dictionary:
-
-#Use the provided dataset from USNews to obtain acceptance rates per college:
-df1 = pd.read_csv('110.Final - Sheet1.csv')
-SchoolNameAcceptance = df1["2"]
-df1.set_index('2').to_dict()  #Convert to a dictionary:
-
-#Generate a CSV file that will be our output:
-# with open('CollegeAcceptanceVSIncome.csv', 'wb') as myfile:  #Please change to your prefered path.
-# 	print ""
-
-#measure time time.timeit 
-
-#1st slow iteration:
-#Token set ratio - the token set ration orders the words in the same order before checking.
-Good_Matches=[]
-for k in df:
-	for i in SchoolNameAcceptance:
-		Fuzzgrades=[fuzz.token_sort_ratio(i,k) for i in SchoolNameAcceptance]
-		i+=i
-	Good_Matches.append(max(Fuzzgrades)) #this smells like n^2.
-
-#Clean Bad matches:
-BadMatches=[]
-FinalMatched=[]
-for i in Good_Matches:
-	if i <=20:
-		BadMatches.append(i)
-		Good_Matches.remove(i)
-	else:
-		FinalMatched.append(i)
-
-print FinalMatched
-
-#take time time.timeit  and print.
-
-#Optional:
-#Better,faster version iteration:
-#take time time.timeit  and print.
-
-#better code
-
-#take time time.timeit  and print.
