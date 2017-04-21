@@ -40,7 +40,7 @@ def fuzzy(driver):
 		max_token = 0
 		max_acc_rate = 0
 		for us_name, acc_rate in zip(USNewsNames,USNewsAcceptance):
-			token = fuzz.token_set_ratio(college, us_name) # O(s_1 + s_2)
+			token = fuzz.token_set_ratio(college, us_name)
 			if token > max_token:
 				max_token = token
 				max_acc_rate = acc_rate
@@ -52,7 +52,7 @@ def fuzzy(driver):
 # 	for college, earnings in zip(Payscalelist, EarningsList):
 # 		items = []
 # 		for us_name, acc_rate in zip(USNewsNames,USNewsAcceptance):
-# 			items.append([acc_rate, fuzz.token_set_ratio(college, us_name)]) # O(s_1 + s_2)
+# 			items.append([acc_rate, fuzz.token_set_ratio(college, us_name)])
 # 		items = sorted(items, key = lambda x: x[1], reverse = True)	
 # 		tbl.append([college, earnings, items[0][0]])
 		
