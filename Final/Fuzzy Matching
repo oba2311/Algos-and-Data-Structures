@@ -34,9 +34,6 @@ def dataPrep():
 
 #########################
 #Fuzzy:
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
-
 def fuzzy(driver):
 	tbl = []
 	for college, earnings in zip(Payscalelist, EarningsList):
