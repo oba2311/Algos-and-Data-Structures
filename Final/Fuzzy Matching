@@ -6,29 +6,30 @@ import sys
 import subprocess
 import pandas as pd
 
+
+Payscalelist=[]
+EarningsList=[]
+
 def scrap():
 	#run the script called "Scraping Payscale", to obtain expected earnings after graduation:
 	PayScaleEarnings = subprocess.check_output([sys.executable, "scrape payscale.py"])
 	df = pd.read_csv("PayScaleEarnings.csv")
 	#create lists of the names and payment:
-	Payscalelist=[]
 	for index, row in df.iterrows():
 	    Payscalelist.append(row['School Name'])
-
-	EarningsList=[]
 	for index, row in df.iterrows():
 	    EarningsList.append(row['Early Career Median Pay'])
 	return Payscalelist, EarningsList
 
+USNewsNames=[]
+USNewsAcceptance=[]
 def dataPrep():
 	#Use the provided dataset from USNews to obtain acceptance rates per college:
-	USNewsNames=[]
-	USNewsAcceptance=[]
 	df1 = pd.read_csv('110.Final.csv')
 	for index, row in df1.iterrows():
 	    USNewsNames.append(row['name'])
-	for index, row in df1.iterrows():
 	    USNewsAcceptance.append(row['Fall 2015 acceptance rate'])
+
 	return USNewsNames, USNewsAcceptance
 
 #########################
@@ -36,31 +37,35 @@ def dataPrep():
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
-def fuzz(driver):
-    myDB["Fuzzmatched"]=myDB.apply(lambda row: fuzz.token_sort_ratio(row[myDB.columns[0]], s[myDB.columns[2]]), axis=1)
-    print(driver)
-    return(driver)
-
-#Token set ratio - the token set ration orders the words in the same order before checking.
-
-#Generate a CSV file that will be our output:
-def createDB(list1,list2,list3,list4):
-	rows = zip(list1,list2,list3,list4)
-	with open('CollegeAcceptanceVSIncome.csv', 'wb') as myfile:
-		w = csv.writer(myfile)
-		w.writerow(['Payscale college','Earnings','USNews college','Acceptance Rate'])
-		for row in rows:
-			w.writerow(row)
-
-	#Turn in into a df:
-	pd.dataframe=myfile
-	myDB = pd.read_csv("CollegeAcceptanceVSIncome.csv")
-	return myDB
+def fuzzy(driver):
+	tbl = []
+	for college, earnings in zip(Payscalelist, EarningsList):
+		max_token = 0
+		max_acc_rate = 0
+		for us_name, acc_rate in zip(USNewsNames,USNewsAcceptance):
+			token = fuzz.token_set_ratio(college, us_name) # O(s_1 + s_2)
+			if token > max_token:
+				max_token = token
+				max_acc_rate = acc_rate
+		tbl.append([college, earnings, max_acc_rate])
+		
+######### slow fuzzy:
+# def fuzzy(driver):
+# 	tbl = []
+# 	for college, earnings in zip(Payscalelist, EarningsList):
+# 		items = []
+# 		for us_name, acc_rate in zip(USNewsNames,USNewsAcceptance):
+# 			items.append([acc_rate, fuzz.token_set_ratio(college, us_name)]) # O(s_1 + s_2)
+# 		items = sorted(items, key = lambda x: x[1], reverse = True)	
+# 		tbl.append([college, earnings, items[0][0]])
+		
+	with open(driver, "wb") as f:
+		writer = csv.writer(f)
+		writer.writerows(tbl)
 
 scrap()
-dataPrep()
-createDB(Payscalelist,EarningsList,USNewsNames,USNewsAcceptance)
-fuzz("CollegeAcceptanceVSIncome.csv")
+dataPrep()	
+fuzzy("CollegeAcceptanceVSIncome.csv")
 
 #take time time.timeit  and print.
 
@@ -69,5 +74,4 @@ fuzz("CollegeAcceptanceVSIncome.csv")
 # BeautifulSoup from: https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 # Requests from: http://docs.python-requests.org/en/master/
 # Python-Levenstein from: 
-
 #USnews DataSet from: https://github.com/Shengjiezh/Scraping-USNews-College-Ranking/blob/master/ranking_university_USnews.csv
