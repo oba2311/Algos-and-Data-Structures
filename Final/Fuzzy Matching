@@ -35,7 +35,7 @@ def dataPrep():
 #########################
 #Fuzzy:
 
-######### slow fuzzy:
+######### 
 # def fuzzy(driver):
 # 	tbl = []
 # 	for college, earnings in zip(Payscalelist, EarningsList):
@@ -48,7 +48,7 @@ def dataPrep():
 # 				max_acc_rate = acc_rate
 # 		tbl.append([college, earnings, max_acc_rate])
 		
-
+#slow fuzzy:
 def fuzzy(driver):
 	tbl = []
 	for college, earnings in zip(Payscalelist, EarningsList):
@@ -58,9 +58,9 @@ def fuzzy(driver):
 		items = sorted(items, key = lambda x: x[1], reverse = True)	
 		tbl.append([college, earnings, items[0][0]])
 		
-	with open(driver, "wb") as f:
-		writer = csv.writer(f)
-		writer.writerows(tbl)
+# 	with open(driver, "wb") as f:
+# 		writer = csv.writer(f)
+# 		writer.writerows(tbl)
 
 scrap()
 dataPrep()	
